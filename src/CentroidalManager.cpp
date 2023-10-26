@@ -149,7 +149,13 @@ void CentroidalManager::reset(const mc_rtc::Configuration & nominalCentroidalPos
 {
   if(nominalCentroidalPoseConfig.has("nominalCentroidalPose"))
   {
-    nominalCentroidalPoseConfig("nominalCentroidalPose", config().nominalCentroidalPose);
+    if (nominalCentroidalPoseConfig("nominalCentroidalPose").isString() &&
+        nominalCentroidalPoseConfig("nominalCentroidalPose") == "Relative") {
+      config().nominalCentroidalPose = sva::PTransformd(ctl().robot().com());
+    } else {
+      // assuming that nominalCentroidalPose has sva::PTransformd
+      nominalCentroidalPoseConfig("nominalCentroidalPose", config().nominalCentroidalPose);
+    }
   }
   reset();
 }

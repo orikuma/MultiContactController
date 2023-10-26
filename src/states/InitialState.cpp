@@ -81,7 +81,19 @@ bool InitialState::run(mc_control::fsm::Controller &)
     if(config_.has("configs") && config_("configs").has("nominalPosture"))
     {
       mc_rtc::Configuration nominalPostureConfig = config_("configs")("nominalPosture");
-      PostureManager::PostureMap initPosture = nominalPostureConfig("target");
+      PostureManager::PostureMap initPosture;
+      if (nominalPostureConfig("target").isString() && nominalPostureConfig("target") == "Relative") {
+        for (auto j : ctl().robot().mb().joints()) {
+          std::string jn = j.name();
+          if (jn == "Root") {
+            continue;
+          }
+          int idx = ctl().robot().jointIndexByName(jn);
+          initPosture[jn] = ctl().robot().q()[idx];
+        }
+      } else {
+        initPosture = nominalPostureConfig("target");
+      }
       ctl().postureManager_->reset(initPosture);
     }
     else
