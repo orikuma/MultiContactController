@@ -16,6 +16,19 @@ void InitialState::start(mc_control::fsm::Controller & _ctl)
 
   phase_ = 0;
 
+  // Set baseTime
+  if(config_.has("configs") && config_("configs").has("baseTime"))
+  {
+    if(config_("configs")("baseTime") == "Relative")
+    {
+      baseTime_ = ctl().t();
+    }
+    else
+    {
+      baseTime_ = static_cast<double>(config_("configs")("baseTime"));
+    }
+  }
+
   // Setup GUI
   ctl().gui()->addElement({ctl().name()}, mc_rtc::gui::Button("Start", [this]() { phase_ = 1; }));
 
@@ -28,7 +41,7 @@ bool InitialState::run(mc_control::fsm::Controller &)
   {
     // Auto start
     if(config_.has("configs") && config_("configs").has("autoStartTime")
-       && ctl().t() > static_cast<double>(config_("configs")("autoStartTime")))
+       && ctl().t() - baseTime_ > static_cast<double>(config_("configs")("autoStartTime")))
     {
       phase_ = 1;
     }

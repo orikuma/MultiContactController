@@ -27,6 +27,9 @@ protected:
   //! Phase
   int phase_ = 0;
 
+  //! Base time to compute duration for autoStartTime
+  double baseTime_ = 0.0;
+
   //! Function to interpolate task stiffness
   std::shared_ptr<TrajColl::CubicInterpolator<double>> stiffnessRatioFunc_;
 
